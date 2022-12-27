@@ -28,18 +28,23 @@ public class TestController {
 
     @GetMapping
     public ResponseEntity getXML() throws JsonProcessingException {
-
+        //
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        XmlMapper xmlMapper = new XmlMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
+
         Date date = Date.valueOf(LocalDate.now());
         SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
         String str = formatter.format(date);
+
+        //
         String url="https://www.cbar.az/currencies/{date}"+".xml";
         ResponseEntity<String> xtr = restTemplate.getForEntity(url,String.class,str);
-        XmlMapper mapper = new XmlMapper();
-        ValCurs val =mapper.readValue(xtr.getBody(), ValCurs.class);
-        ObjectMapper mapper2 = new ObjectMapper();
-        String json = mapper2.writeValueAsString(val);
+
+        ValCurs val =xmlMapper.readValue(xtr.getBody(), ValCurs.class);
+
+        String json = objectMapper.writeValueAsString(val);
 
         return ResponseEntity.ok(json);
 
